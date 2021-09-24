@@ -1,0 +1,10 @@
+%% language = \{ \, w \in \{a,b\}^\ast \mid \mbox{$\#_a(w)$ even} \, \}
+
+input_symbols a b
+states q0 q1
+initial q0
+final q0
+q0 q0 b
+q0 q1 a
+q1 q0 a
+q1 q1 b

@@ -1,0 +1,9 @@
+%% question = Give the DFA obtained from the given NFA using the NFA to DFA procedure. Use set notation like `{q0,q1}` (without spaces) for the states in the DFA.
+
+input_symbols a b
+initial q0
+final q2
+q0 q0 a b
+q0 q1 ε
+q1 q1 a
+q1 q2 b

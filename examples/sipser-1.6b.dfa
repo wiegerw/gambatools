@@ -1,0 +1,23 @@
+%% source = Sipser Exercise 1.6b
+%% title = DFA for { w \in {0,1}* \mid #_1(w) \geq 3 }
+%% language = \{ \, w \in \{0,1\}^\ast \mid \#_1(w) \geqslant 3 \,\}
+%% question = Enter a DFA for the language $\{ \, w \in \{0,1\}^\ast \mid \#_1(w) \geqslant 3 \,\}$, i.e. the language of strings of 0's and 1's with at least three 1's.
+
+input_symbols 0 1
+states qA qB qC qD
+
+initial qA
+final qD
+
+qA qA 0
+qA qB 1
+qB qB 0
+qB qC 1
+qC qC 0
+qC qD 1
+qD qD 0
+qD qD 1
+
+
+%% accepted = 01110 1111 
+%% rejected = 1000

@@ -1,0 +1,6 @@
+%% Sipser 1.18/1.6d
+
+%% language = \{ \, w \in \{a,b\}^\ast \mid |w| \geqslant 3 \land w[2] = a \, \}
+%% question = (Sipser 1.18/1.6d) Give a regular expression over the alphabet $\{a,b\}$ that generates the language $@language@$.
+
+(a+b)(a+b)a(a+b)*

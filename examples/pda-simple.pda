@@ -1,0 +1,11 @@
+%% language = \{ \, a^{\mkern1mu n} b^{\mkern1mu n} \mid n \geqslant 0 \, \}
+%% question = Give a PDA that accepts the language $@language@$.
+
+initial q0
+final q3
+
+q0 q1 e,e$
+q1 q1 a,eX
+q1 q2 e,ee
+q2 q2 b,Xe
+q2 q3 e,$e 

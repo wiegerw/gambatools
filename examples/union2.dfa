@@ -1,0 +1,15 @@
+%% language = \{ w \in \{a,b\}^\ast \mid \mbox{$w$ has substring $abba$} \, \}
+
+input_symbols a b
+states q0 q1 q2 q3 q4
+initial q0
+final q4
+q0 q0 b
+q0 q1 a
+q1 q1 a
+q1 q2 b
+q2 q1 a
+q2 q3 b
+q3 q4 a
+q3 q0 b
+q4 q4 a b

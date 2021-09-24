@@ -1,0 +1,88 @@
+templatefile = templates/cfg-for-language.ipynb
+inputfile = ../examples/cfg1.cfg
+name = cfg-for-language
+
+% This is a comment
+templatefile = templates/dfa-for-language.ipynb
+inputfile = ../examples/dfa1.dfa
+length = 7
+name = dfa-for-language
+
+% This is another comment
+
+templatefile = templates/nfa-for-language.ipynb
+inputfile = ../examples/nfa1.nfa
+length = 7
+states = 8
+name = nfa-for-language
+
+templatefile = templates/pda-for-language.ipynb
+inputfile = ../examples/pda2.pda
+name = pda-for-language
+
+templatefile = templates/tm-for-language.ipynb
+inputfile = ../examples/tm1.tm
+name = tm-for-language
+
+templatefile = templates/regexp-for-language.ipynb
+inputfile = ../examples/regexp1.regexp
+name = regexp-for-language
+
+templatefile = templates/nfa-to-dfa.ipynb
+inputfile = ../examples/nfa2.nfa
+name = nfa-to-dfa
+
+templatefile = templates/dfa-to-regexp.ipynb
+inputfile = ../examples/dfa2.dfa
+name = dfa-to-regexp
+
+% N.B. length=8 is too much for this grammar
+templatefile = templates/cfg-to-chomsky.ipynb
+inputfile = ../examples/cfg2.cfg
+start_variable = T
+length=5
+name = cfg-to-chomsky
+
+templatefile = templates/cfg-cyk-algorithm.ipynb
+inputfile = ../examples/chomsky1.cfg
+word = aab
+name = cfg-cyk-algorithm
+
+templatefile = templates/cfg-leftmost-derivation.ipynb
+inputfile = ../examples/chomsky1.cfg
+word = aab
+name = cfg-leftmost-derivation
+
+templatefile = templates/cfg-rightmost-derivation.ipynb
+inputfile = ../examples/chomsky1.cfg
+word = aabb
+name = cfg-rightmost-derivation
+
+templatefile = templates/cfg-derivation.ipynb
+inputfile = ../examples/chomsky1.cfg
+word = aab
+name = cfg-derivation
+
+templatefile = templates/dfa-union.ipynb
+inputfile1 = ../examples/union1.dfa
+inputfile2 = ../examples/union2.dfa
+name = dfa-union
+
+templatefile = templates/dfa-intersection.ipynb
+inputfile1 = ../examples/intersection1.dfa
+inputfile2 = ../examples/intersection2.dfa
+name = dfa-intersection
+
+templatefile = templates/dfa-symmetric_difference.ipynb
+inputfile1 = ../examples/symmetric_difference1.dfa
+inputfile2 = ../examples/symmetric_difference2.dfa
+name = dfa-symmetric_difference
+
+templatefile = templates/dfa-complement.ipynb
+inputfile = ../examples/complement.dfa
+name = dfa-complement
+
+templatefile = templates/dfa-reverse.ipynb
+inputfile = ../examples/reverse.dfa
+name = dfa-reverse
+

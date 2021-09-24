@@ -1,0 +1,5 @@
+antlr4 -Dlanguage=Python3 CFG.g4 -visitor -no-listener
+antlr4 -Dlanguage=Python3 regexp.g4 -visitor -no-listener
+antlr4 -Dlanguage=Python3 regexp_simple.g4 -visitor -no-listener
+rm *.interp
+rm *.tokens

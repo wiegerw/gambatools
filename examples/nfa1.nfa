@@ -1,0 +1,17 @@
+%% language = \{ w \in \{0,1\}^* \mid \#_0(w) \geq 2, \#_1(w) \leq 1 \}^*
+%% question = Give an NFA that accepts the language $@language@$.
+
+initial s6
+final s2 s5 s6
+s0 s1 0
+s0 s3 1
+s1 s2 0
+s1 s4 1
+s2 s0 ε
+s2 s2 0
+s2 s5 1
+s3 s4 0
+s4 s5 0
+s5 s0 ε
+s5 s5 0
+s6 s0 ε

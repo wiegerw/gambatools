@@ -1,0 +1,6 @@
+input_symbols c
+initial s0
+final s1
+states s0 s1
+s0 s1 c
+s1 s1 c

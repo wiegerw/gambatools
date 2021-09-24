@@ -1,0 +1,23 @@
+%% Sipser Exercise 1.6a
+%% 0.(0+1)*.1
+
+%% question = Give a DFA that generates the language $@language@$.
+%% language = \{ w \in {0,1}^\ast \mid w \text{ starts with } 0 \text{ and ends with } 1 \}
+
+%% selected_word = 0101
+
+input_symbols 0 1
+states qA qB qC qD
+
+initial qA
+final qC
+
+qA qB 0
+qA qD 1
+qB qB 0
+qB qC 1
+qC qB 0
+qC qC 1
+qD qD 0
+qD qD 1
+

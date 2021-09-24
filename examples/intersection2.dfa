@@ -1,0 +1,11 @@
+%% language = \{ \, w \in \{a,b\}^\ast \mid \#_b(w) \geqslant 2 \, \}
+
+input_symbols a b
+states q0 q1 q2
+initial q0
+final q2
+q0 q0 a
+q0 q1 b
+q1 q1 a
+q1 q2 b
+q2 q2 a b
