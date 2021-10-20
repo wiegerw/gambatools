@@ -168,6 +168,7 @@ class TMBuilder(AutomatonBuilder):
         delta = defaultdict(set)
         q0 = State(next(iter(A.initial_states)))
         blank = Symbol(blank)
+        Gamma.add(blank)
         q_accept = State(q_accept)
         q_reject = State(q_reject)
 

@@ -3,9 +3,12 @@
 #  https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from unittest import TestCase
+import os
 
+from gambatools.language_algorithms import words_up_to_n
 from gambatools.tm_algorithms import tm_accepts_word, tm_words_up_to_n, tm_simulate_word, print_tm_state, parse_tm
 from gambatools.printing import print_words
+from gambatools.text_utility import read_utf8_text, remove_comments
 
 
 class Test(TestCase):
@@ -76,6 +79,38 @@ class Test(TestCase):
         result = print_words(tm_words_up_to_n(T, 5))
         expected_result = '{#, 0#0, 1#1, 00#00, 01#01, 10#10, 11#11}'
         self.assertEqual(expected_result, result)
+
+    def test_tape_alphabet(self):
+        # This is a test for issue https://github.com/wiegerw/gambatools/issues/1
+        turing_machine = '''
+        initial q0\n
+        accept q1\n
+        q0 q1 ab,R\n
+        '''
+        parse_tm(turing_machine)
+
+    def test_tm_words_up_to_n(self):
+        count = 0
+        length = 8
+        if not os.path.exists('../examples/tm'):
+            return
+        for filename in os.listdir('../examples/tm'):
+            if not filename.endswith('.tm'):
+                continue
+            print(filename)
+            count = count + 1
+            text = read_utf8_text(os.path.join('../examples/tm', filename))
+            P = parse_tm(text)
+            all_words = words_up_to_n(P.Sigma, length)
+            words = tm_words_up_to_n(P, length)
+            self.assertTrue(all(len(word) <= length for word in words))
+            print(filename, len(words))
+            for word in all_words:
+                if not tm_accepts_word(P, word) == (word in words):
+                    print('word =', word)
+                    print(remove_comments(text))
+                self.assertTrue(tm_accepts_word(P, word) == (word in words))
+        self.assertGreater(count, 0)
 
 
 if __name__ == '__main__':
