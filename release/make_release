@@ -3,7 +3,7 @@
 # See https://packaging.python.org/tutorials/packaging-projects/
 
 # 1) update the version number in setup.cfg
-VERSION=0.12
+VERSION=0.13
 
 # 2) preparation
 sudo python3 -m pip install --upgrade pip setuptools wheel twine
