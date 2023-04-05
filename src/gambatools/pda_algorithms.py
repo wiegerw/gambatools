@@ -13,6 +13,7 @@ from gambatools.automaton_algorithms import default_state_label_regex, Automaton
 
 from gambatools.dfa import State, Symbol
 from gambatools.dfa_algorithms import fresh_state
+from gambatools.global_settings import GambaTools
 from gambatools.pda import PDA
 from gambatools.cfg import CFG, Variable, Terminal, Rule, Alternative
 
@@ -245,7 +246,14 @@ def pda_epsilon_closure(P: PDA, R: Iterable[PDAState]) -> Set[PDAState]:
 
     result: Set[PDAState] = set([r for r in R])
     todo: Set[PDAState] = set([r for r in R])
-    while len(todo) > 0:
+
+    # The loop below may not terminate in case of epsilon cycles. For this
+    # reason we limit the number of iterations of the loop.
+    max_iterations = GambaTools.pda_epsilon_closure_max_iterations
+    iteration = 0
+
+    while len(todo) > 0 and iteration < max_iterations:
+        iteration += 1
         src = todo.pop()
         for (p, a, u), Q1 in delta.items():
             if p != src.q or a != epsilon:

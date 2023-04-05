@@ -9,7 +9,7 @@ regular expressions. Moreover, the package provides Jupyter notebooks with
 exercises. The library has been developed by Wieger Wesselink,
 and it was designed together with Erik de Vink.
 
-# GAMBA
+## GAMBA
 The code was developed as part of the GAMBA project, which stands for:
 *Grammars and Automata Made Boffo and Assessible*. The goals of the project are
 to support
@@ -21,29 +21,29 @@ to support
 
 (*boffo*: extremely successful, sensational)
 
-# License
+## License
 The code is distributed under the `GPL-3.0-or-later` license.
 
-# Installation
+## Installation
 The package can be installed using
 ```
 pip install gambatools
 ```
 The required python packages can be found in `requirements.txt`.
 
-# Rendering images
+## Rendering images
 For visualization the [graphviz](https://pypi.org/project/graphviz/) python
 package is used. **To render the generated DOT source code, you also need to install
 Graphviz**. See the [Graphviz website](https://graphviz.org/) for further instructions.
 Make sure that the directory containing the `dot` executable is on your systems’ path. 
 
-# Documentation
+## Documentation
 The file `doc/specifications.pdf` contains formal specifications
 of the algorithms in the library. Note that the code maps almost one-to-one
 to the specifications, so in order to understand the code please consult the
 pseudocode specifications.
 
-# Notebooks
+## Notebooks
 The directory `notebooks` contains a number of Jupyter notebooks
 with exercises. In `notebooks/with-answers` the correct answers are
 already given, while in `notebooks/without-answers` they have been
@@ -73,7 +73,7 @@ qD qD 0
 qD qD 1
 ```
 
-# Notebook generation
+## Notebook generation
 For convenience there is a mechanism to automatically generate notebooks from
 templates.
 The notebooks in `notebooks/with-answers` and `notebooks/without-answers`
@@ -86,7 +86,15 @@ The templates contain tags of the form `<<tag>>` that are substituted by
 the `make_notebook.py` script. This generation is still experimental, and
 there is currently no documentation available for this.
 
-# Contact
+## Configuration
+
+* `GambaTools.pda_epsilon_closure_max_iterations`:
+this parameter is a limit on the number of iterations in the
+function `pda_epsilon_closure`. This value is introduced to avoid infinite
+computations on PDAs that contain epsilon-loops. Note that this limit may
+cause the function `pda_words_up_to_n` to miss words in exceptional cases. 
+
+## Contact
 If you are interested in using the package for education or have questions
 or feedback, the authors can be reached by email:
 <e.p.d.vink@tue.nl> or <j.w.wesselink@tue.nl>.

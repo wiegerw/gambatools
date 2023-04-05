@@ -237,7 +237,7 @@ class Test(TestCase):
         length = 8
         if not os.path.exists('../examples/pda'):
             return
-        for filename in os.listdir('../examples/pda'):
+        for filename in sorted(os.listdir('../examples/pda')):
             if not filename.endswith('.pda'):
                 continue
             count = count + 1
