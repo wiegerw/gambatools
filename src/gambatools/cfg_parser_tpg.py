@@ -20,22 +20,39 @@ class CFGParser(tpg.Parser):
         token IDENTIFIER       "[α-ωa-zA-Z_][α-ωa-zA-Z_0-9']*"                                         ;
 
         # productions
-        START                -> context_free_grammar                                                   ;
-        context_free_grammar -> rule_list SEMICOLON?                                                   ;
-        rule_list            -> rule_ (SEMICOLON rule_)*                                               ;
-        variable             -> IDENTIFIER                                                             ;
-        symbol               -> IDENTIFIER | ONE                                                       ;
-        symbol_list          -> symbol (DOT symbol)*                                                   ;
-        alternative          -> symbol_list                                                            ;
-        alternative_list     -> alternative (BAR alternative)*                                         ;
-        rule_                -> variable ARROW alternative_list                                        ;
+        START/rules                -> context_free_grammar/rules                                       ;
+        context_free_grammar/rules -> rule_list/rules SEMICOLON?                                       ;
+
+        rule_list/rules               ->                             $ rules = [] $
+                                         rule_/r                     $ rules.append(r) $
+                                         (
+                                           SEMICOLON
+                                           rule_/r                   $ rules.append(r) $
+                                         )*                                                            ;
+        variable/var                  -> IDENTIFIER/var                                                ;
+        symbol/s                      -> IDENTIFIER/s  |  ONE/s                                        ;
+        symbol_list/symbols           ->                             $ symbols = [] $
+                                         symbol/s                    $ symbols.append(s) $
+                                         (
+                                         DOT
+                                         symbol/s                    $ symbols.append(s) $
+                                         )*                                                            ;
+        alternative/symbols           -> symbol_list/symbols                                           ;
+        alternative_list/alternatives ->                             $ alternatives = [] $
+                                         alternative/a               $ alternatives.append(a) $
+                                         (
+                                         BAR
+                                         alternative/a               $ alternatives.append(a) $
+                                         )*                                                            ;
+        rule_/r                      -> variable/var
+                                        ARROW
+                                        alternative_list/alternatives $ r = (var, alternatives) $      ;
     '''
 
 
 def parse_cfg(text):
     parser = CFGParser()
-    parser(text)
-    rules = []
+    rules = parser(text)
 
     V = set([rule[0] for rule in rules])
     Sigma = set([])
@@ -67,13 +84,17 @@ def parse_cfg(text):
 
 
 if __name__ == "__main__":
-    parser = CFGParser()
-    parser('S -> 1')
-    parser('S -> A.B')
-    parser('''
+    def f(text):
+        G = parse_cfg(text)
+        print('--------------------')
+        print(G)
+
+    f('S -> 1')
+    f('S -> A.B')
+    f('''
        S -> A.B ;
        A -> 1 ;
        B -> a | b
     ''')
-    parser('S -> α.β')
-    parser("S -> A'.B'")
+    f('S -> α.β')
+    f("S -> A'.B'")
