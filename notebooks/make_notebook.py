@@ -15,7 +15,7 @@ from gambatools.cfg_algorithms import parse_simple_cfg, cfg_print_simple, cfg_cy
     cfg_derive_word
 from gambatools.dfa import DFA
 from gambatools.dfa_algorithms import parse_dfa, print_dfa, dfa_union, dfa_intersection, \
-    dfa_symmetric_difference, dfa_complement, dfa_reverse, dfa_minimize
+    dfa_symmetric_difference, dfa_complement, dfa_reverse, dfa_quotient
 from gambatools.nfa import NFA
 from gambatools.nfa_algorithms import parse_nfa, nfa_to_dfa, print_nfa
 from gambatools.notebook_chomsky import cfg_apply_chomsky
@@ -141,7 +141,7 @@ def apply_command(command: str, arguments: List[str]) -> str:
     elif command == 'dfa_minimize':
         inputfile = arguments[0]
         D = parse_dfa(read_utf8_text(inputfile))
-        D = dfa_minimize(D)
+        D = dfa_quotient(D)
         return print_dfa(D)
     elif command == 'cfg_cyk_matrix':
         inputfile, word = arguments
