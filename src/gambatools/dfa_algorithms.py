@@ -155,6 +155,61 @@ def dfa_from_table(D: DFA, table: Mapping[Tuple[int, int], bool]) -> DFA:
     return DFA(Q_r, Sigma, delta_r, q_r, F_r)
 
 
+
+def dfa_quotient(D: DFA) -> DFA:
+    def equal_sets(A, B):
+        return all(x in B for x in A) and all(x in A for x in B)
+
+    def state(q: Set[State]) -> State:
+        return State(print_state_set(q))
+
+    Q = D.Q
+    Sigma = D.Sigma
+    delta = D.delta
+    F = D.F
+    q0 = D.q0
+
+    VV = [F, Q - F]  # Need to use a list, since sets are not hashable
+    eq = {}
+
+    while True:
+        for V in VV:
+            for v in V:
+                eq[v] = V
+
+        VV1 = []
+        for V in VV:
+            WW = []
+            for v in V:
+                matched = False
+                for W in WW:
+                    w = next(iter(W))  # w is an arbitrary element of W
+                    if all(eq[delta[v, a]] == eq[delta[w, a]] for a in Sigma):
+                        W.add(v)
+                        matched = True
+                        break
+                if not matched:
+                    WW.append({v})
+            VV1.extend(WW)
+        if equal_sets(VV, VV1):
+            break
+        else:
+            VV = VV1
+
+    Q1 = {state(V) for V in VV}
+    delta1 = {}
+    for V in VV:
+        for a in Sigma:
+            v = next(iter(V))
+            q = state(V)
+            q1 = state(eq[delta[v, a]])
+            delta1[q, a] = q1
+    F1 = set([state(V) for V in VV if not V.isdisjoint(F)])
+    q0_1 = state(eq[q0])
+
+    return DFA(Q1, Sigma, delta1, q0_1, F1)
+
+
 def dfa_isomorphic(D1: DFA, D2: DFA) -> bool:
     assert D1.Sigma == D2.Sigma
     Sigma = D1.Sigma

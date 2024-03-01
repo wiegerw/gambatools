@@ -28,6 +28,10 @@ def state_product_regex() -> str:
     return r'\(\w+,\w+\)'
 
 
+def state_word_or_set_regex() -> str:
+    return r'(\w+)|(\{[\w,]*\})'
+
+
 def dfa_keywords() -> FrozenSet[str]:
     return frozenset(['input_symbols'])
 

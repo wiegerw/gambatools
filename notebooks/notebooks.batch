@@ -86,3 +86,7 @@ templatefile = templates/dfa-reverse.ipynb
 inputfile = ../examples/reverse.dfa
 name = dfa-reverse
 
+templatefile = templates/dfa-minimal.ipynb
+inputfile = ../examples/minimal.dfa
+name = dfa-minimal
+
