@@ -4,14 +4,14 @@
 
 from typing import List, Tuple
 
-from gambatools.automaton_algorithms import state_product_regex
+from gambatools.automaton_algorithms import state_product_regex, state_set_regex, state_word_or_set_regex
 from gambatools.dfa_algorithms import parse_dfa, dfa_union, dfa_intersection, dfa_symmetric_difference, \
-    dfa_complement, dfa_words_up_to_n
+    dfa_complement, dfa_words_up_to_n, dfa_minimize
 from gambatools.dfa import DFA, State, Symbol
 from gambatools.language_algorithms import language_reverse
 from gambatools.language_generator import compare_languages, check_equal_languages, generate_language
 from gambatools.nfa_algorithms import parse_nfa
-from gambatools.notebook import print_feedback, show, show_product
+from gambatools.notebook import print_feedback, show, show_product, show_nfa2dfa
 
 
 def extract_states(q: State) -> Tuple[State, State]:
@@ -166,3 +166,24 @@ def check_dfa_reverse(dfa: str, nfa: str, length: int = 8) -> None:
         print('Error: {}'.format(e))
 
 
+def check_dfa_minimal(dfa: str, answer_dfa: str, length: int = 8) -> None:
+    try:
+        D = parse_dfa(dfa)
+        D = dfa_minimize(D)
+        answer = parse_dfa(answer_dfa, state_regex=state_word_or_set_regex())
+
+        feedback = []
+
+        if D.Sigma != answer.Sigma:
+            feedback.append('The alphabet of the complement should be equal to the alphabet of the original DFA')
+
+        if len(D.Q) != len(answer.Q):
+            feedback.append('The number of states is incorrect')
+
+        L1 = generate_language(answer, length)
+        L2 = generate_language(D, length)
+        feedback = feedback + compare_languages(L1, L2)
+
+        print_feedback(feedback)
+    except Exception as e:
+        print('Error: {}'.format(e))
