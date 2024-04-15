@@ -16,7 +16,7 @@ from gambatools.cfg import CFG
 from gambatools.regexp import Regexp
 from gambatools.dfa_algorithms import State, Symbol, parse_dfa, dfa_accepts_word
 from gambatools.automaton_algorithms import parse_automaton, state_set_regex, default_state_label_regex, \
-    state_product_regex
+    state_product_regex, state_word_or_set_regex
 from gambatools.automaton_io import automaton_to_dot
 from gambatools.cfg_algorithms import cfg_accepts_word, parse_simple_cfg, cfg_words_up_to_n
 from gambatools.dfa_algorithms import dfa_words_up_to_n, dfa_simulate_word
@@ -71,15 +71,11 @@ def show_automaton(text: str, check: Optional[Callable] = None, state_regex=defa
 
 
 def show(text: str) -> graphviz.Digraph:
-    return show_automaton(text)
+    return show_automaton(text, state_regex=state_word_or_set_regex())
 
 
 def show_product(text: str) -> graphviz.Digraph:
     return show_automaton(text, state_regex=state_product_regex())
-
-
-def show_nfa2dfa(text: str) -> graphviz.Digraph:
-    return show_automaton(text, state_regex=state_set_regex())
 
 
 def show_dfa(text: str) -> graphviz.Digraph:
