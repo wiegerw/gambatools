@@ -3,3 +3,4 @@ graphviz
 jupyter
 tabulate
 ipython
+notebook>=6.5.6
