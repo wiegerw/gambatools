@@ -155,7 +155,6 @@ def dfa_from_table(D: DFA, table: Mapping[Tuple[int, int], bool]) -> DFA:
     return DFA(Q_r, Sigma, delta_r, q_r, F_r)
 
 
-
 def dfa_quotient(D: DFA) -> DFA:
     def equal_sets(A, B):
         return all(x in B for x in A) and all(x in A for x in B)

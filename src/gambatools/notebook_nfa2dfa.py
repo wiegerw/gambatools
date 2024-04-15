@@ -6,12 +6,19 @@ import itertools
 import re
 from typing import Set
 
+import graphviz
+
 from gambatools.automaton_algorithms import state_set_regex
 from gambatools.dfa import DFA, State, print_state_set
 from gambatools.dfa_algorithms import parse_dfa
 from gambatools.nfa import NFA
 from gambatools.nfa_algorithms import parse_nfa, nfa_to_dfa, epsilon_closure
-from gambatools.notebook import show, show_nfa2dfa, print_feedback
+from gambatools.notebook import print_feedback, show_automaton, show
+
+
+def show_nfa2dfa(text: str) -> graphviz.Digraph:
+    return show_automaton(text, state_regex=state_set_regex())
+
 
 
 def check_nfa_to_dfa_answer(N: NFA, answer: NFA):

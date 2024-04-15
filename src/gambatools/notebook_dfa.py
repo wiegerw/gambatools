@@ -11,7 +11,7 @@ from gambatools.dfa import DFA, State, Symbol
 from gambatools.language_algorithms import language_reverse
 from gambatools.language_generator import compare_languages, check_equal_languages, generate_language
 from gambatools.nfa_algorithms import parse_nfa
-from gambatools.notebook import print_feedback, show, show_product, show_nfa2dfa
+from gambatools.notebook import print_feedback, show, show_product
 
 
 def extract_states(q: State) -> Tuple[State, State]:
