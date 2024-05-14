@@ -6,12 +6,20 @@ import copy
 import itertools
 import io
 from collections import defaultdict
-from typing import Set, MutableMapping, Tuple, Mapping, List
+from typing import Any, Dict, Set, MutableMapping, Tuple, Mapping, List
 
 from gambatools.automaton import Automaton
 from gambatools.automaton_algorithms import default_transition_label_regex, default_state_label_regex, AutomatonParser, AutomatonBuilder
 from gambatools.dfa import State, Symbol, print_state_set, DFA
 from gambatools.nfa import NFA
+
+
+def set_element(S: Set[Any]) -> Any:
+    return next(iter(S))
+
+
+def map_element(S: Dict[Any, Any]) -> Tuple[Any, Any]:
+    return next(iter(S))
 
 
 def dfa_accepts_word(D: DFA, word: str) -> bool:
@@ -182,7 +190,7 @@ def dfa_quotient(D: DFA) -> DFA:
             for v in V:
                 matched = False
                 for W in WW:
-                    w = next(iter(W))  # w is an arbitrary element of W
+                    w = set_element(W)
                     if all(eq[delta[v, a]] == eq[delta[w, a]] for a in Sigma):
                         W.add(v)
                         matched = True
@@ -199,7 +207,7 @@ def dfa_quotient(D: DFA) -> DFA:
     delta1 = {}
     for V in VV:
         for a in Sigma:
-            v = next(iter(V))
+            v = set_element(V)
             q = state(V)
             q1 = state(eq[delta[v, a]])
             delta1[q, a] = q1
@@ -226,7 +234,7 @@ def dfa_isomorphic(D1: DFA, D2: DFA) -> bool:
         return False
 
     while len(to_inspect) > 0:
-        (q1, q2) = next(iter(to_inspect))
+        (q1, q2) = set_element(to_inspect)
         to_inspect.remove((q1, q2))
         for a in Sigma:
             q1_ = D1.delta[q1, a]
@@ -267,7 +275,7 @@ def dfa_isomorphic1(D1: DFA, D2: DFA) -> bool:
     todo = {(D1.q0, D2.q0)}
 
     while len(todo) > 0:
-        (q1, q2) = next(iter(todo))
+        (q1, q2) = set_element(todo)
         todo.remove((q1, q2))
         if (q1 in F1) != (q2 in F2):
             return False
@@ -384,7 +392,7 @@ class DFABuilder(AutomatonBuilder):
         Q = set(State(s) for s in A.states)
         Sigma = set(Symbol(s) for s in input_symbols)
         delta = {}
-        q0 = State(next(iter(A.initial_states)))
+        q0 = State(set_element(A.initial_states))
         F = set(State(s) for s in A.final_states)
         for (p, a, q) in A.transitions:
             p = State(p)
@@ -553,3 +561,57 @@ def dfa_no_extend(D: DFA) -> DFA:
     F = set(qf for qf in D.F if len(dfa_reachable_states(D, qf, 1) & D.F) == 0)
 
     return DFA(Q, Sigma, delta, q0, F)
+
+
+def dfa_hopfcroft(D: DFA) -> DFA:
+
+    def min_(P, Q):
+        return P if len(P) <= len(Q) else Q
+
+    def split(P: Set[State], W: Set[State], a: Symbol) -> Tuple[Set[State], Set[State]]:
+        W1 = {w for w in W if any(delta[w, a] == p for p in P)}
+        return W1, W - W1
+
+    def state(q: Set[State]) -> State:
+        return State(print_state_set(q))
+
+    Q = D.Q
+    Sigma = D.Sigma
+    delta = D.delta
+    F = D.F
+    q0 = D.q0
+
+    # Returns (Q1, Q2) in Q_ x Q_ such that there is an a-transition between Q1 and Q2
+    def connected_state_sets(Q_: Set[Set[State]], a: Symbol):
+        for Q1 in Q_:
+            Q1_a = {delta[q, a] for q in Q1}
+            for Q2 in Q_:
+                if not Q1_a.isdisjoint(Q2):
+                    yield Q1, Q2
+
+    P_cal = [F, Q - F]  # the initial partition
+
+    min_QF = min_(F, Q - F)
+    W_cal = {min_QF: a for a in Sigma}  # the initial waiting set
+
+    while len(W_cal) > 0:
+        (W, a) = map_element(W_cal)
+        del W_cal[W]
+        for P in P_cal:
+            P1, P2 = split(P, W, a)
+            if len(P1) == 0 or len(P2) == 0:
+                break
+            P_cal = (P_cal - {P}) | {P1, P2}
+            for b in Sigma:
+                if P in W_cal:
+                    W_cal.pop(P)
+                    W_cal[P1] = b
+                    W_cal[P2] = b
+                else:
+                    W_cal[min_(P1, P2)] = b
+
+    Q_cal = {state(Q) for Q in P_cal}
+    delta1 = {(state(Q1), a): state(Q2) for a in Sigma for (Q1, Q2) in connected_state_sets(P_cal, a)}
+    Q0 = state({next(Q for Q in P_cal if q0 in Q)})
+    F_cal = {state(Q) for Q in P_cal if not Q.isdisjoint(F)}
+    return DFA(Q_cal, Sigma, delta1, Q0, F_cal)
