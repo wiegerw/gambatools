@@ -6,7 +6,7 @@ import copy
 import itertools
 import io
 from collections import defaultdict
-from typing import Any, Dict, Set, MutableMapping, Tuple, Mapping, List
+from typing import Any, Dict, Set, MutableMapping, Tuple, Mapping, List, FrozenSet
 
 from gambatools.automaton import Automaton
 from gambatools.automaton_algorithms import default_transition_label_regex, default_state_label_regex, AutomatonParser, AutomatonBuilder
@@ -18,8 +18,8 @@ def set_element(S: Set[Any]) -> Any:
     return next(iter(S))
 
 
-def map_element(S: Dict[Any, Any]) -> Tuple[Any, Any]:
-    return next(iter(S))
+def map_element(M: Dict[Any, Any]) -> Tuple[Any, Any]:
+    return next(iter(M.values()))
 
 
 def dfa_accepts_word(D: DFA, word: str) -> bool:
@@ -568,9 +568,9 @@ def dfa_hopfcroft(D: DFA) -> DFA:
     def min_(P, Q):
         return P if len(P) <= len(Q) else Q
 
-    def split(P: Set[State], W: Set[State], a: Symbol) -> Tuple[Set[State], Set[State]]:
-        W1 = {w for w in W if any(delta[w, a] == p for p in P)}
-        return W1, W - W1
+    def split(W: FrozenSet[State], a: Symbol, P: FrozenSet[State]) -> Tuple[FrozenSet[State], FrozenSet[State]]:
+        P1 = {p for p in P if any(delta[p, a] == w for w in W)}
+        return frozenset(P1), frozenset(P - P1)
 
     def state(q: Set[State]) -> State:
         return State(print_state_set(q))
@@ -589,19 +589,25 @@ def dfa_hopfcroft(D: DFA) -> DFA:
                 if not Q1_a.isdisjoint(Q2):
                     yield Q1, Q2
 
-    P_cal = [F, Q - F]  # the initial partition
+    P_cal = {frozenset(F), frozenset(Q - F)}  # the initial partition
+    # print(f'P_cal = {P_cal}')
 
-    min_QF = min_(F, Q - F)
+    min_QF = frozenset(min_(F, Q - F))
     W_cal = {min_QF: a for a in Sigma}  # the initial waiting set
+    # print(f'W_cal = {W_cal}')
+    # print('-------------------------------------')
 
     while len(W_cal) > 0:
-        (W, a) = map_element(W_cal)
-        del W_cal[W]
+        (W, a) = W_cal.popitem()
+        # print(f'(W, a) = ({W, a})')
         for P in P_cal:
-            P1, P2 = split(P, W, a)
+            # print('--- iteration ---')
+            P1, P2 = split(W, a, P)
+            # print(f'P = {set(P)} P1 = {set(P1)}, P2 = {set(P2)}')
             if len(P1) == 0 or len(P2) == 0:
                 break
             P_cal = (P_cal - {P}) | {P1, P2}
+            # print(f'P_cal = {P_cal}')
             for b in Sigma:
                 if P in W_cal:
                     W_cal.pop(P)
@@ -611,7 +617,8 @@ def dfa_hopfcroft(D: DFA) -> DFA:
                     W_cal[min_(P1, P2)] = b
 
     Q_cal = {state(Q) for Q in P_cal}
+    # print(f'Q_cal = {Q_cal}')
     delta1 = {(state(Q1), a): state(Q2) for a in Sigma for (Q1, Q2) in connected_state_sets(P_cal, a)}
-    Q0 = state({next(Q for Q in P_cal if q0 in Q)})
+    Q0 = state(next(Q for Q in P_cal if q0 in Q))
     F_cal = {state(Q) for Q in P_cal if not Q.isdisjoint(F)}
     return DFA(Q_cal, Sigma, delta1, Q0, F_cal)

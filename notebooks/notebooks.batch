@@ -90,3 +90,7 @@ templatefile = templates/dfa-minimal.ipynb
 inputfile = ../examples/minimal.dfa
 name = dfa-minimal
 
+templatefile = templates/dfa-hopfcroft.ipynb
+inputfile = ../examples/minimal.dfa
+name = dfa-hopfcroft
+
