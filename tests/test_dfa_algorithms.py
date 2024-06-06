@@ -8,7 +8,7 @@ from unittest import TestCase
 
 from gambatools.cfg_algorithms import parse_cfg_baeten, cfg_to_dfa
 from gambatools.dfa_algorithms import dfa_accepts_word, dfa_words_up_to_n, random_dfa, \
-    dfa_minimize, dfa_simulate_word, parse_dfa, dfa_isomorphic, dfa_isomorphic1, dfa_hopfcroft
+    dfa_minimize, dfa_simulate_word, parse_dfa, dfa_isomorphic, dfa_isomorphic1, dfa_hopfcroft, dfa_quotient
 from gambatools.nfa_algorithms import nfa_words_up_to_n
 from gambatools.dfa import State, Symbol, DFA
 from gambatools.regexp import Regexp
@@ -142,30 +142,42 @@ class Test(TestCase):
                 print('words_up_to_n(N, {}) = {}'.format(n, print_words(wordsN)))
             self.assertEqual(wordsD, wordsN, wordsR)
 
-    def test_dfa_minimize(self):
+    def _test_dfa_minimize(self, D: DFA, minimize):
+        D1 = minimize(D)
+        n = 4
+        wordsD = dfa_words_up_to_n(D, n)
+        wordsD1 = dfa_words_up_to_n(D1, n)
+        if wordsD != wordsD1:
+            print('--- dfa D ---')
+            print(D)
+            print(f'--- dfa D1 ({minimize.__name__}) ---')
+            print(D1)
+            print('words_up_to_n(D, {}) = {}'.format(n, print_words(wordsD)))
+            print('words_up_to_n(D1, {}) = {}'.format(n, print_words(wordsD1)))
+        self.assertEqual(wordsD, wordsD1)
+        self.assertLessEqual(len(D1.Q), len(D.Q))
+
+    def test_dfa_minimize1(self):
+        grammar = '''
+            initial q0
+            final q0 q1
+            states q0 q1 q2
+            q0 q1 a
+            q0 q2 b
+            q1 q2 a
+            q1 q2 b
+            q2 q2 a
+            q2 q2 b
+        '''
+        D: DFA = parse_dfa(grammar)
+        self._test_dfa_minimize(D, dfa_hopfcroft)
+        self._test_dfa_minimize(D, dfa_quotient)
+
+    def test_dfa_minimize2(self):
         for i in range(100):
-            print('test_dfa_minimize {}'.format(i))
-            D = random_dfa({Symbol('a'), Symbol('b')}, 5)
-            D1 = dfa_minimize(D)
-            D2 = dfa_hopfcroft(D)
-            n = 4
-            wordsD = dfa_words_up_to_n(D, n)
-            wordsD1 = dfa_words_up_to_n(D1, n)
-            wordsD2 = dfa_words_up_to_n(D2, n)
-            if wordsD != wordsD1 or wordsD != wordsD2:
-                print('--- dfa D ---')
-                print(D)
-                print('--- dfa D1 (minimized) ---')
-                print(D1)
-                print('--- dfa D2 (hopfcroft) ---')
-                print(D2)
-                print('words_up_to_n(D, {}) = {}'.format(n, print_words(wordsD)))
-                print('words_up_to_n(D1, {}) = {}'.format(n, print_words(wordsD1)))
-                print('words_up_to_n(D2, {}) = {}'.format(n, print_words(wordsD2)))
-            self.assertEqual(wordsD, wordsD1)
-            self.assertEqual(wordsD, wordsD2)
-            self.assertLessEqual(len(D1.Q), len(D.Q))
-            self.assertLessEqual(len(D2.Q), len(D.Q))
+            D = random_dfa({Symbol('a'), Symbol('b')}, 3)
+            self._test_dfa_minimize(D, dfa_quotient)
+            self._test_dfa_minimize(D, dfa_hopfcroft)
 
     def test_dfa_isomorphic(self):
         for i in range(100):

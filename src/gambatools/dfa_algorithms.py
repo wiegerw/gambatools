@@ -553,6 +553,20 @@ def dfa_reachable_states(D: DFA, q: State, depth=0) -> Set[State]:
     return discovered
 
 
+def dfa_remove_unreachable_states(D: DFA) -> DFA:
+    Q = D.Q
+    Sigma = D.Sigma
+    delta = D.delta
+    q0 = D.q0
+    F = D.F
+
+    Q1 = dfa_reachable_states(D, q0)
+    F1 = F & Q1
+    delta1 = {(q, a): delta[q, a] for (q, a) in delta if q in Q1}
+
+    return DFA(Q1, Sigma, delta1, q0, F1)
+
+
 def dfa_no_extend(D: DFA) -> DFA:
     Q = D.Q.copy()
     Sigma = D.Sigma.copy()
@@ -575,6 +589,8 @@ def dfa_hopfcroft(D: DFA) -> DFA:
     def state(q: Set[State]) -> State:
         return State(print_state_set(q))
 
+    # D = dfa_remove_unreachable_states(D)
+
     Q = D.Q
     Sigma = D.Sigma
     delta = D.delta
@@ -590,34 +606,33 @@ def dfa_hopfcroft(D: DFA) -> DFA:
                     yield Q1, Q2
 
     P_cal = {frozenset(F), frozenset(Q - F)}  # the initial partition
-    # print(f'P_cal = {P_cal}')
+    print(f'P_cal = {P_cal}')
 
     min_QF = frozenset(min_(F, Q - F))
-    W_cal = {min_QF: a for a in Sigma}  # the initial waiting set
-    # print(f'W_cal = {W_cal}')
-    # print('-------------------------------------')
+    W_cal = set((min_QF, a) for a in Sigma)  # the initial waiting set
+    print(f'W_cal = {W_cal}')
+    print('-------------------------------------')
 
     while len(W_cal) > 0:
-        (W, a) = W_cal.popitem()
-        # print(f'(W, a) = ({W, a})')
+        (W, a) = W_cal.pop()
+        print(f'(W, a) = ({W, a})')
         for P in P_cal:
-            # print('--- iteration ---')
+            print('--- iteration ---')
             P1, P2 = split(W, a, P)
-            # print(f'P = {set(P)} P1 = {set(P1)}, P2 = {set(P2)}')
+            print(f'P = {set(P)} P1 = {set(P1)}, P2 = {set(P2)}')
             if len(P1) == 0 or len(P2) == 0:
                 break
             P_cal = (P_cal - {P}) | {P1, P2}
-            # print(f'P_cal = {P_cal}')
+            print(f'P_cal = {P_cal}')
             for b in Sigma:
                 if P in W_cal:
-                    W_cal.pop(P)
-                    W_cal[P1] = b
-                    W_cal[P2] = b
+                    W_cal.remove(P)
+                    W_cal |= {(P1, b), (P2, b)}
                 else:
-                    W_cal[min_(P1, P2)] = b
+                    W_cal |= {(min_(P1, P2), b)}
 
     Q_cal = {state(Q) for Q in P_cal}
-    # print(f'Q_cal = {Q_cal}')
+    print(f'Q_cal = {Q_cal}')
     delta1 = {(state(Q1), a): state(Q2) for a in Sigma for (Q1, Q2) in connected_state_sets(P_cal, a)}
     Q0 = state(next(Q for Q in P_cal if q0 in Q))
     F_cal = {state(Q) for Q in P_cal if not Q.isdisjoint(F)}
