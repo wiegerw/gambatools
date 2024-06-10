@@ -11,7 +11,9 @@ from typing import Any, Dict, Set, MutableMapping, Tuple, Mapping, List, FrozenS
 from gambatools.automaton import Automaton
 from gambatools.automaton_algorithms import default_transition_label_regex, default_state_label_regex, AutomatonParser, AutomatonBuilder
 from gambatools.dfa import State, Symbol, print_state_set, DFA
+from gambatools.dfa_io import draw_dfa
 from gambatools.nfa import NFA
+from gambatools.logging import log
 
 
 def set_element(S: Set[Any]) -> Any:
@@ -577,7 +579,30 @@ def dfa_no_extend(D: DFA) -> DFA:
     return DFA(Q, Sigma, delta, q0, F)
 
 
+def check_dfa_is_total(Q: Set[State], Sigma: Set[Symbol], delta: Mapping[Tuple[State, Symbol], State], q0: State, F: Set[State], context: DFA) -> None:
+    D = DFA(Q, Sigma, delta, q0, F, check_validity=False)
+    if not D._is_total():
+        dot = draw_dfa(Q, Sigma, delta, q0, F)
+        dot.render('output-graph', format='png', view=True)
+        dot = draw_dfa(context.Q, context.Sigma, context.delta, context.q0, context.F)
+        dot.render('context', format='png', view=True)
+        raise RuntimeError('DFA is not total.')
+
+
 def dfa_hopfcroft(D: DFA) -> DFA:
+    def print_Q(Q: FrozenSet[str]) -> str:
+        return f"{{{','.join(sorted(Q))}}}"
+
+    def print_P(P: Set[FrozenSet[str]]) -> str:
+        items = [print_Q(Q) for Q in P]
+        return f"{{{', '.join(items)}}}"
+
+    def print_Q_a(Q: FrozenSet[str], a: str) -> str:
+        return f"({print_Q(Q)}, {a})"
+
+    def print_W(W: Set[Tuple[FrozenSet[str], str]]) -> str:
+        items = [print_Q_a(Q, a) for Q, a in W]
+        return f"{{{', '.join(items)}}}"
 
     def min_(P, Q):
         return P if len(P) <= len(Q) else Q
@@ -606,24 +631,30 @@ def dfa_hopfcroft(D: DFA) -> DFA:
                     yield Q1, Q2
 
     P_cal = {frozenset(F), frozenset(Q - F)}  # the initial partition
-    print(f'P_cal = {P_cal}')
+    if frozenset() in P_cal:
+        P_cal.remove(frozenset())
+    log(f'P_cal initial = {print_P(P_cal)}')
 
     min_QF = frozenset(min_(F, Q - F))
     W_cal = set((min_QF, a) for a in Sigma)  # the initial waiting set
-    print(f'W_cal = {W_cal}')
-    print('-------------------------------------')
+    log(f'W_cal initial = {print_W(W_cal)}')
+    log('-------------------------------------')
 
     while len(W_cal) > 0:
         (W, a) = W_cal.pop()
-        print(f'(W, a) = ({W, a})')
+        log(f'(W, a) = {print_Q_a(W, a)}')
         for P in P_cal:
-            print('--- iteration ---')
+            if len(P) == 1:
+                continue
+            log('--- iteration ---')
+            log(f'W = {print_Q(W)}, a = {a}, P = {print_Q(P)}')
             P1, P2 = split(W, a, P)
-            print(f'P = {set(P)} P1 = {set(P1)}, P2 = {set(P2)}')
+            log(f'split(W, a, P) = {print_Q(P1)}, {print_Q(P2)}')
             if len(P1) == 0 or len(P2) == 0:
-                break
+                log('continue')
+                continue
             P_cal = (P_cal - {P}) | {P1, P2}
-            print(f'P_cal = {P_cal}')
+            log(f'P_cal = {print_P(P_cal)}')
             for b in Sigma:
                 if P in W_cal:
                     W_cal.remove(P)
@@ -631,8 +662,10 @@ def dfa_hopfcroft(D: DFA) -> DFA:
                 else:
                     W_cal |= {(min_(P1, P2), b)}
 
+    log(f'P_cal final = {print_P(P_cal)}')
+    log(f'W_cal final = {print_W(W_cal)}')
+
     Q_cal = {state(Q) for Q in P_cal}
-    print(f'Q_cal = {Q_cal}')
     delta1 = {(state(Q1), a): state(Q2) for a in Sigma for (Q1, Q2) in connected_state_sets(P_cal, a)}
     Q0 = state(next(Q for Q in P_cal if q0 in Q))
     F_cal = {state(Q) for Q in P_cal if not Q.isdisjoint(F)}

@@ -9,11 +9,13 @@ from unittest import TestCase
 from gambatools.cfg_algorithms import parse_cfg_baeten, cfg_to_dfa
 from gambatools.dfa_algorithms import dfa_accepts_word, dfa_words_up_to_n, random_dfa, \
     dfa_minimize, dfa_simulate_word, parse_dfa, dfa_isomorphic, dfa_isomorphic1, dfa_hopfcroft, dfa_quotient
+from gambatools.dfa_io import draw_dfa
 from gambatools.nfa_algorithms import nfa_words_up_to_n
 from gambatools.dfa import State, Symbol, DFA
 from gambatools.regexp import Regexp
 from gambatools.regexp_algorithms import regexp_to_nfa, regexp_words_up_to_n, dfa_to_regexp
 from gambatools.printing import print_words
+from gambatools.global_settings import GambaTools
 
 
 def permute_dfa_states(D: DFA) -> DFA:
@@ -154,6 +156,10 @@ class Test(TestCase):
             print(D1)
             print('words_up_to_n(D, {}) = {}'.format(n, print_words(wordsD)))
             print('words_up_to_n(D1, {}) = {}'.format(n, print_words(wordsD1)))
+            dot = draw_dfa(D.Q, D.Sigma, D.delta, D.q0, D.F)
+            dot.render('D', format='png', view=True)
+            dot = draw_dfa(D1.Q, D1.Sigma, D1.delta, D1.q0, D1.F)
+            dot.render(f'{minimize.__name__}(D)', format='png', view=True)
         self.assertEqual(wordsD, wordsD1)
         self.assertLessEqual(len(D1.Q), len(D.Q))
 
@@ -174,6 +180,7 @@ class Test(TestCase):
         self._test_dfa_minimize(D, dfa_quotient)
 
     def test_dfa_minimize2(self):
+        # GambaTools.enable_logging = True
         for i in range(100):
             D = random_dfa({Symbol('a'), Symbol('b')}, 3)
             self._test_dfa_minimize(D, dfa_quotient)

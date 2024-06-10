@@ -7,3 +7,8 @@ class GambaTools(object):
     The maximum number of iterations for the pda_algorithms.pda_epsilon_closure functions
     """
     pda_epsilon_closure_max_iterations = 1000
+
+    """
+    Set this variable to True to print intermediate output of the algorithms
+    """
+    enable_logging = False
