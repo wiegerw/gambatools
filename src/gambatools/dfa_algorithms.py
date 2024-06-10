@@ -643,7 +643,8 @@ def dfa_hopfcroft(D: DFA) -> DFA:
     while len(W_cal) > 0:
         (W, a) = W_cal.pop()
         log(f'(W, a) = {print_Q_a(W, a)}')
-        for P in P_cal:
+        P_cal_copy = P_cal.copy()
+        for P in P_cal_copy:
             if len(P) == 1:
                 continue
             log('--- iteration ---')

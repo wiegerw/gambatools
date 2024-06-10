@@ -181,8 +181,8 @@ class Test(TestCase):
 
     def test_dfa_minimize2(self):
         # GambaTools.enable_logging = True
-        for i in range(100):
-            D = random_dfa({Symbol('a'), Symbol('b')}, 3)
+        for i in range(1000):
+            D = random_dfa({Symbol('a'), Symbol('b')}, 5)
             self._test_dfa_minimize(D, dfa_quotient)
             self._test_dfa_minimize(D, dfa_hopfcroft)
 
