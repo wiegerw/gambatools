@@ -3,17 +3,17 @@
 # See https://packaging.python.org/tutorials/packaging-projects/
 
 # 1) update the version number in setup.cfg
-VERSION=0.13
+VERSION=0.20
 
 # 2) preparation
-sudo python3 -m pip install --upgrade pip setuptools wheel twine
+sudo python -m pip install --upgrade pip setuptools wheel twine
 
 # 3) create a distribution
 cd ..
-python3 -m build
+python -m build
 
 # 4) show the distribution
 ls dist/gambatools-${VERSION}*
 
 # 5) upload the distribution
-#python3 -m twine upload --repository pypi dist/gambatools-${VERSION}*
+#python -m twine upload --repository pypi dist/gambatools-${VERSION}*
