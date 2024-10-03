@@ -33,6 +33,7 @@ jobs:
     - name: Run tests
       env:
         PYTHONPATH: ${{ github.workspace }}\src
+        PYTHONIOENCODING: utf-8
       run: |
         python -m unittest discover tests
 
