@@ -38,7 +38,7 @@ Graphviz**. See the [Graphviz website](https://graphviz.org/) for further instru
 Make sure that the directory containing the `dot` executable is on your systems’ path. 
 
 ## Documentation
-The file `doc/specifications.pdf` contains formal specifications
+The file https://wiegerw.github.io/gambatools/pdf/main.pdf contains formal specifications
 of the algorithms in the library. Note that the code maps almost one-to-one
 to the specifications, so in order to understand the code please consult the
 pseudocode specifications.
